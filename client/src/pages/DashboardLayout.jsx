@@ -1,7 +1,13 @@
 import React, { useContext, createContext } from "react";
-import { Outlet, redirect, useLoaderData , useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  redirect,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 import Wrapper from "../assets/wrappers/Dashboard";
-import { SmallSideBar, BigSideBar, Navbar } from "../components/index";
+import { SmallSideBar, BigSideBar, Navbar, Loading } from "../components/index";
 import customFetch from "../utils/customFetch";
 import { toast } from "react-toastify";
 
@@ -18,8 +24,9 @@ const DashboardContext = createContext();
 
 export default function DashboardLayout({ checkDarkTheme }) {
   const { user } = useLoaderData();
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isPageLoading = navigation.state === "loading";
   const [showSideBar, setShowSideBar] = React.useState(false);
   const [darkTheme, setDarkTheme] = React.useState(checkDarkTheme());
 
@@ -34,9 +41,9 @@ export default function DashboardLayout({ checkDarkTheme }) {
   };
 
   const logoutUser = async () => {
-    navigate("/")
-    await customFetch.get("/auth/logout")
-    toast.success("Logging Out..")
+    navigate("/");
+    await customFetch.get("/auth/logout");
+    toast.success("Logging Out..");
   };
 
   return (
@@ -57,7 +64,7 @@ export default function DashboardLayout({ checkDarkTheme }) {
           <div>
             <Navbar />
             <div className="dashboard-page">
-              <Outlet context={{ user }} /> 
+              {isPageLoading ? <Loading /> : <Outlet context={{ user }} />}
             </div>
           </div>
         </main>
